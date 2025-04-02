@@ -1,0 +1,150 @@
+<h2 class="text-2xl font-semibold mb-3">Salve, {{ username }}!</h2>
+<span class="text-base font-normal text-color-secondary">Oggi è {{ currentDate | date: "fullDate" : "EEEE, MMMM d, y" }}</span>
+<p-toolbar styleClass="mt-4 px-4 py-3 rounded-t-lg">
+  <ng-template pTemplate="left">
+    <div class="flex gap-2">
+      <p-button label="Nuovo Articolo" icon="pi pi-plus" styleClass="p-button-success" routerLink="/bcms-admin/articles/new"></p-button>
+      <p-button label="Nuova Pagina" icon="pi pi-plus" styleClass="p-button-info" routerLink="/bcms-admin/pages/new"></p-button>
+      <p-button label="Carica Media" icon="pi pi-upload" styleClass="p-button-secondary" routerLink="/bcms-admin/media"></p-button>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="right">
+    <p-button
+      label="Impostazioni"
+      icon="pi pi-cog"
+      styleClass="p-button-outlined p-button-secondary"
+      routerLink="/bcms-admin/settings"
+    ></p-button>
+  </ng-template>
+</p-toolbar>
+<h3 class="text-xl font-semibold mb-3">Riepilogo Contenuti</h3>
+<div class="grid grid-cols-12 gap-8">
+  <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+    <p-card class="mb-0" styleClass="text-center">
+      <ng-template pTemplate="title">
+        <span class="text-base font-medium text-color-secondary">Articoli Pubblicati</span>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <div *ngIf="!isLoading(); else statsSkeleton" class="text-3xl font-bold text-primary">{{ stats.publishedArticles ?? 0 }}</div>
+      </ng-template>
+    </p-card>
+  </div>
+  <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+    <p-card class="mb-0" styleClass="text-center">
+      <ng-template pTemplate="title">
+        <span class="text-base font-medium text-color-secondary">Pagine Pubblicate</span>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <div *ngIf="!isLoading(); else statsSkeleton" class="text-3xl font-bold text-primary">{{ stats.publishedPages ?? 0 }}</div>
+      </ng-template>
+    </p-card>
+  </div>
+  <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+    <p-card styleClass="text-center">
+      <ng-template pTemplate="title">
+        <span class="text-base font-medium text-color-secondary">Bozze Totali</span>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <div *ngIf="!isLoading(); else statsSkeleton" class="text-3xl font-bold text-color">{{ stats.drafts ?? 0 }}</div>
+      </ng-template>
+    </p-card>
+  </div>
+  <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+    <p-card styleClass="text-center">
+      <ng-template pTemplate="title">
+        <span class="text-base font-medium text-color-secondary">Utenti Registrati</span>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <div *ngIf="!isLoading(); else statsSkeleton" class="text-3xl font-bold text-color">{{ stats.users ?? 0 }}</div>
+      </ng-template>
+    </p-card>
+  </div>
+
+  <ng-template #statsSkeleton>
+    <p-skeleton height="2rem" styleClass="mb-1"></p-skeleton>
+  </ng-template>
+
+  <div class="col-span-12 xl:col-span-6">
+    <p-card header="Attività Recenti">
+      <div *ngIf="!isLoading(); else listSkeleton">
+        <p-listbox
+          [options]="recentActivity"
+          optionLabel="title"
+          [style]="{ 'max-height': '300px' }"
+          listStyleClass="p-0"
+          [virtualScroll]="recentActivity.length > 10"
+        >
+          <ng-template let-item pTemplate="item">
+            <div class="flex justify-content-between align-items-center w-full gap-3 px-3 py-2">
+              <div class="flex-grow-1 flex-shrink-1" style="min-width: 0">
+                <a
+                  [routerLink]="item.editUrl"
+                  class="font-medium hover:text-primary no-underline text-color"
+                  title="{{ item.title }}"
+                  style="display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
+                >
+                  {{ item.title }}
+                </a>
+              </div>
+
+              <div class="flex-shrink-0 text-center white-space-nowrap">
+                <small class="text-color-secondary text-sm">{{ item.type }} &bull; {{ item.date | date: "dd/MM/yy" }}</small>
+              </div>
+
+              <div class="flex-shrink-0">
+                <p-tag [value]="item.status" [severity]="getStatusSeverity(item.status)"></p-tag>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="empty">Nessuna attività recente.</ng-template>
+        </p-listbox>
+      </div>
+    </p-card>
+  </div>
+
+  <div class="col-span-12 xl:col-span-6">
+    <p-card header="Le Tue Bozze">
+      <div *ngIf="!isLoading(); else listSkeleton">
+        <p-listbox
+          [options]="myDrafts"
+          optionLabel="title"
+          [style]="{ 'max-height': '300px' }"
+          listStyleClass="p-0"
+          [virtualScroll]="myDrafts.length > 10"
+        >
+          <ng-template let-item pTemplate="item">
+            <div class="flex justify-content-between align-items-center w-full gap-3 px-3 py-2">
+              <div class="flex-grow-1 flex-shrink-1" style="min-width: 0">
+                <a
+                  [routerLink]="item.editUrl"
+                  class="font-medium hover:text-primary no-underline text-color"
+                  title="{{ item.title }}"
+                  style="display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
+                >
+                  {{ item.title }}
+                </a>
+              </div>
+
+              <div class="flex-shrink-0 text-center white-space-nowrap">
+                <small class="text-color-secondary text-sm">{{ item.type }} &bull; Salvato: {{ item.date | date: "dd/MM/yy" }}</small>
+              </div>
+
+              <div class="flex-shrink-0">
+                <p-tag [value]="item.status" [severity]="getStatusSeverity(item.status)"></p-tag>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="empty">Nessuna bozza.</ng-template>
+        </p-listbox>
+      </div>
+    </p-card>
+  </div>
+
+  <ng-template #listSkeleton>
+    <div class="flex flex-col gap-2 w-full">
+      <p-skeleton height="3.5rem"></p-skeleton>
+      <p-skeleton height="3.5rem"></p-skeleton>
+      <p-skeleton height="3.5rem"></p-skeleton>
+    </div>
+  </ng-template>
+</div>

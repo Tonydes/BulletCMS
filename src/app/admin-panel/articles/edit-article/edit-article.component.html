@@ -1,0 +1,17 @@
+<div class="card p-4">
+  <h2>{{ articleId ? "Edit Article" : "New Article" }}</h2>
+
+  <form [formGroup]="form" (ngSubmit)="saveArticle()">
+    <div class="mb-3">
+      <label for="title">Title</label>
+      <input id="title" type="text" pInputText formControlName="title" class="w-full" />
+    </div>
+
+    <div class="mb-3">
+      <label for="content">Content</label>
+      <p-editor formControlName="content"></p-editor>
+    </div>
+
+    <p-button label="Save" icon="pi pi-save" type="submit" [disabled]="isLoading()" />
+  </form>
+</div>

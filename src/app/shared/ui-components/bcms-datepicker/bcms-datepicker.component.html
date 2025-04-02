@@ -1,0 +1,25 @@
+<div class="flex flex-col gap-2 w-full">
+  <label *ngIf="label" [for]="inputId">{{ label }}</label>
+  <p-datepicker
+    [inputId]="inputId"
+    [(ngModel)]="internalValue"
+    (ngModelChange)="onValueChange($event)"
+    (onBlur)="onBlur()"
+    [placeholder]="placeholder"
+    [dateFormat]="dateFormat"
+    [showIcon]="showIcon"
+    [minDate]="minDate"
+    [maxDate]="maxDate"
+    [showTime]="showTime"
+    [hourFormat]="_hourFormat"
+    [readonlyInput]="readonlyInput"
+    [disabled]="isDisabled"
+    [styleClass]="styleClass"
+    [inputStyleClass]="inputStyleClass"
+    [appendTo]="appendTo"
+    [selectionMode]="selectionMode"
+    [touchUI]="touchUI"
+    fluid
+    #datepicker
+  ></p-datepicker>
+</div>

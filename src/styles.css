@@ -1,0 +1,69 @@
+@import 'tailwindcss';
+@import 'tailwindcss-primeui';
+@custom-variant dark (&:where(.app-dark, .app-dark *));
+@import './assets/css/variables.css';
+@import 'primeicons/primeicons.css';
+
+.p-fileupload-advanced {
+  border: 1px solid var(--p-inputtext-border-color) !important;
+}
+
+#editorjs {
+  border: 1px solid var(--p-inputtext-border-color);
+  border-radius: var(--p-inputtext-border-radius);
+  box-shadow: var(--p-inputtext-shadow);
+  padding-top: 1rem;
+  transition:
+    background var(--p-inputtext-transition-duration),
+    color var(--p-inputtext-transition-duration),
+    border-color var(--p-inputtext-transition-duration),
+    outline-color var(--p-inputtext-transition-duration),
+    box-shadow var(--p-inputtext-transition-duration);
+}
+
+#editorjs:hover {
+  border-color: var(--p-inputtext-hover-border-color);
+  transition:
+    background var(--p-inputtext-transition-duration),
+    color var(--p-inputtext-transition-duration),
+    border-color var(--p-inputtext-transition-duration),
+    outline-color var(--p-inputtext-transition-duration),
+    box-shadow var(--p-inputtext-transition-duration);
+}
+
+#editorjs.ng-invalid.ng-dirty {
+  border-color: var(--p-inputtext-invalid-border-color);
+}
+
+#editorjs:focus {
+  border-color: var(--p-inputtext-focus-border-color);
+  box-shadow: var(--p-inputtext-focus-ring-shadow);
+  outline: var(--p-inputtext-focus-ring-width) var(--p-inputtext-focus-ring-style) var(--p-inputtext-focus-ring-color);
+  outline-offset: var(--p-inputtext-focus-ring-offset);
+}
+
+::ng-deep .ce-block__content {
+  padding-left: 4.5rem;
+  padding-right: 1.5rem;
+}
+
+::ng-deep .ce-block__content,
+::ng-deep .ce-toolbar__content {
+  max-width: 100% !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+::ng-deep .ce-paragraph {
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+::ng-deep .ce-toolbar {
+  right: inherit !important;
+  left: 4.5rem !important;
+}
+
+.p-datatable-mask {
+  display: none !important;
+}

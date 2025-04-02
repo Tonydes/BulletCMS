@@ -1,0 +1,28 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "123456",
+      "role": "admin"
+    },
+    {
+      "id": 2,
+      "username": "user",
+      "password": "123456",
+      "role": "user"
+    }
+  ],
+  "posts": [
+    {
+      "id": 1,
+      "title": "Post 1",
+      "content": "Contenuto del primo post"
+    },
+    {
+      "title": "Post 2",
+      "content": "<p>Contenuto&nbsp;del&nbsp;secondo&nbsp;post&nbsp;test</p>",
+      "id": 2
+    }
+  ]
+}

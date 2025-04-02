@@ -1,0 +1,287 @@
+<p-fluid class="p-fluid">
+  <div class="flex flex-col">
+    <p-toolbar styleClass="px-4 py-3 rounded-t-lg">
+      <ng-template pTemplate="left">
+        <span class="text-xl md:text-2xl font-semibold">
+          {{ pageMode() === "create" ? "Crea Pagina" : "Modifica Pagina" }}
+        </span>
+      </ng-template>
+      <ng-template pTemplate="right">
+        <div class="flex gap-2">
+          <p-button
+            label="Salva"
+            icon="pi pi-save"
+            (onClick)="savePage()"
+            [loading]="saving()"
+            styleClass="p-button-outlined p-button-secondary"
+          />
+          <p-button label="Pubblica" icon="pi pi-check" severity="success" (onClick)="publishPage()" [loading]="publishing()" />
+        </div>
+      </ng-template>
+    </p-toolbar>
+
+    <form #pageFormId [formGroup]="pageForm" class="flex flex-col md:flex-row gap-6 mt-6">
+      <div class="md:w-9/12">
+        <p-tabs value="0">
+          <p-tablist styleClass="border-b border-surface-border">
+            <p-tab value="0" styleClass="px-3 py-2 text-sm font-medium cursor-pointer text-color-secondary hover:text-color">Main</p-tab>
+            <p-tab value="1" styleClass="px-3 py-2 text-sm font-medium cursor-pointer text-color-secondary hover:text-color">SEO</p-tab>
+          </p-tablist>
+          <p-tabpanels styleClass="pt-5">
+            <p-tabpanel value="0">
+              <div class="grid grid-cols-1 gap-0">
+                <div class="card flex flex-col gap-4">
+                  <div class="flex flex-col gap-2 w-full">
+                    <label for="title">Titolo Pagina</label>
+                    <input pInputText id="title" formControlName="title" class="w-full" />
+                  </div>
+
+                  <div class="flex flex-col gap-2 w-full">
+                    <label for="fileUploader">Immagine in Evidenza</label>
+                    <p-fileupload
+                      chooseLabel="Carica Immagine"
+                      name="featured_image"
+                      (onUpload)="onImageUpload($event)"
+                      [multiple]="true"
+                      accept="image/*"
+                      [maxFileSize]="maxFileSize"
+                      mode="advanced"
+                      url="https://www.primefaces.org/cdn/api/upload.php"
+                    >
+                      <ng-template #empty>
+                        <div>Drag and drop files here to upload.</div>
+                      </ng-template>
+                      <ng-template #content>
+                        <ul *ngIf="uploadedFiles.length">
+                          <li *ngFor="let file of uploadedFiles">{{ file.name }} - {{ file.size }} bytes</li>
+                        </ul>
+                      </ng-template>
+                    </p-fileupload>
+                  </div>
+
+                  <div class="flex flex-col gap-2 w-full">
+                    <label for="editorjs">Contenuto</label>
+                    <div id="editorjs"></div>
+                  </div>
+
+                  <div class="flex flex-col gap-2 w-full">
+                    <label for="author">Autore</label>
+                    <p-select
+                      inputId="author"
+                      [options]="authors()"
+                      formControlName="author"
+                      optionLabel="name"
+                      placeholder="Seleziona Autore"
+                      styleClass="w-full"
+                    />
+                  </div>
+                </div>
+              </div>
+            </p-tabpanel>
+
+            <p-tabpanel value="1">
+              <div class="grid grid-cols-1 gap-0">
+                <div class="card flex flex-col gap-4">
+                  <div class="flex flex-col gap-2 w-full">
+                    <label for="excludeFromSitemap">Escludi questa pagina dalla sitemap XML?</label>
+                    <p-toggleButton
+                      formControlName="excludeFromSitemap"
+                      [onLabel]="'Escludi da Sitemap'"
+                      offLabel="Includi in Sitemap"
+                      [onIcon]="'pi pi-ban'"
+                      offIcon="pi pi-check-circle"
+                      ariaLabel="Inclusione Sitemap"
+                    />
+                  </div>
+                  <div class="flex flex-col gap-2 w-full">
+                    <label for="metaTitle">Meta Title (Titolo SEO)</label>
+                    <input
+                      pInputText
+                      id="metaTitle"
+                      formControlName="metaTitle"
+                      placeholder="Inserisci il titolo per i motori di ricerca"
+                    />
+                    <small>Ottimale: 50-60 caratteri. Appare nei risultati di ricerca.</small>
+                  </div>
+                  <div class="flex flex-wrap gap-2 w-full">
+                    <label for="metaDescription">Meta Description</label>
+                    <textarea
+                      pTextarea
+                      placeholder="Scivi la meta description"
+                      id="metaDescription"
+                      formControlName="metaDescription"
+                      rows="4"
+                    ></textarea>
+                    <small>Ottimale: 150-160 caratteri. Appare sotto il titolo nei risultati di ricerca.</small>
+                  </div>
+                  <div class="flex flex-col gap-2 w-full">
+                    <label for="focusKeyphrase">Focus Keyphrase (Parola Chiave Principale)</label>
+                    <input pInputText id="focusKeyphrase" formControlName="focusKeyphrase" placeholder="Es: ricette facili veloci" />
+                    <small>La parola chiave principale per cui vuoi ottimizzare questa pagina (per analisi interna).</small>
+                  </div>
+                  <div class="flex flex-col gap-2 w-full">
+                    <label for="canonicalUrl">Canonical URL</label>
+                    <input
+                      pInputText
+                      type="url"
+                      id="canonicalUrl"
+                      formControlName="canonicalUrl"
+                      placeholder="https://www.tuosito.com/url-preferito"
+                    />
+                    <small>
+                      Lascia vuoto per usare l'URL corrente. Specifica se questa pagina è un duplicato o una versione alternativa di
+                      un'altra.
+                    </small>
+                  </div>
+
+                  <div class="flex flex-col gap-2 w-full">
+                    <label for="metaRobotsIndex">Meta Robots Index (Istruzioni per i crawler)</label>
+                    <p-select
+                      [options]="[
+                        { label: 'Index', value: 'index' },
+                        { label: 'NoIndex', value: 'noindex' }
+                      ]"
+                      formControlName="metaRobotsIndex"
+                      optionLabel="label"
+                      optionValue="value"
+                    ></p-select>
+                    <small>Permetti ai motori di indicizzare questa pagina?</small>
+                  </div>
+                  <div class="flex flex-col gap-2 w-full">
+                    <label for="metaRobotsFollow">Meta Robots Follow (Istruzioni per i crawler)</label>
+                    <p-select
+                      [options]="[
+                        { label: 'Follow', value: 'follow' },
+                        { label: 'NoFollow', value: 'nofollow' }
+                      ]"
+                      formControlName="metaRobotsFollow"
+                      optionLabel="label"
+                      optionValue="value"
+                    ></p-select>
+                    <small>Permetti ai motori di seguire i link su questa pagina?</small>
+                  </div>
+
+                  <h5>Anteprima Social (Open Graph)</h5>
+                  <div class="fflex flex-col gap-2 w-full">
+                    <label for="ogTitle">Titolo Open Graph</label>
+                    <input pInputText id="ogTitle" formControlName="ogTitle" placeholder="Titolo per condivisione social" />
+                    <small>Se vuoto, userà il Meta Title.</small>
+                  </div>
+                  <div class="flex flex-col gap-2 w-full">
+                    <label for="ogDescription">Descrizione Open Graph</label>
+                    <textarea
+                      pTextarea
+                      id="ogDescription"
+                      formControlName="ogDescription"
+                      placeholder="Descrizione per condivisione social"
+                      rows="3"
+                    ></textarea>
+                    <small>Se vuota, userà la Meta Description.</small>
+                  </div>
+                  <div class="flex flex-col gap-2 w-full">
+                    <label for="ogImageUrl">URL Immagine Open Graph</label>
+                    <input
+                      pInputText
+                      type="url"
+                      id="ogImageUrl"
+                      formControlName="ogImageUrl"
+                      placeholder="https://.../immagine-social.jpg"
+                    />
+                    <small>Immagine specifica per la condivisione (es: 1200x630px).</small>
+                  </div>
+                </div>
+              </div>
+            </p-tabpanel>
+          </p-tabpanels>
+        </p-tabs>
+      </div>
+
+      <div class="md:w-3/12">
+        <div class="flex flex-col gap-0">
+          <div class="card flex flex-row gap-4">
+            <div class="md:w-1/2">
+              <p-button label="Anteprima" icon="pi pi-eye" styleClass="p-button-outlined w-full" (onClick)="previewPage()" />
+            </div>
+            <div class="md:w-1/2">
+              <p-button label="Vai al link" icon="pi pi-window-maximize" styleClass="p-button-outlined w-full" (onClick)="previewPage()" />
+            </div>
+          </div>
+
+          <div class="card flex flex-col gap-4">
+            <div class="flex items-center justify-between mb-3">
+              <span>Pubblicato</span>
+              <p-toggleSwitch formControlName="isPublished" (onChange)="togglePublish($event)" />
+            </div>
+            <bcms-datepicker
+              label="Data Pubblicazione"
+              inputId="publishDate"
+              formControlName="publishDate"
+              appendTo="body"
+            ></bcms-datepicker>
+          </div>
+
+          <div class="card flex flex-col gap-4">
+            <div class="flex flex-col gap-2 w-full">
+              <label for="slug">Slug (URL)</label>
+              <input pInputText type="text" id="slug" formControlName="slug" />
+              <small class="text-xs text-color-secondary block">
+                Lo slug verrà usato nell'URL. Usa solo lettere minuscole, numeri e trattini.
+              </small>
+            </div>
+
+            <div class="flex flex-col gap-2 w-full">
+              <label for="tags">Tag</label>
+              <p-multiSelect
+                inputId="tags"
+                [options]="tags()"
+                formControlName="tags"
+                optionLabel="name"
+                placeholder="Seleziona Tag"
+                display="chip"
+              />
+            </div>
+
+            <div class="flex flex-col gap-2 w-full">
+              <label for="parent">Parent</label>
+              <p-select [options]="parentOptions" formControlName="parent" placeholder="Seleziona genitore" />
+            </div>
+
+            <div class="flex flex-col gap-2 w-full">
+              <label for="parent">Header</label>
+              <p-select [options]="headerOptions" formControlName="header" placeholder="Seleziona header" />
+            </div>
+
+            <div class="flex flex-col gap-2 w-full">
+              <label for="components">Componenti</label>
+              <p-multiSelect
+                inputId="components"
+                [options]="availableFeatures()"
+                formControlName="components"
+                optionLabel="name"
+                placeholder="Aggiungi Componenti"
+                display="chip"
+              />
+            </div>
+
+            <div class="flex flex-col gap-2 w-full">
+              <label for="articleFilter">Includi articoli</label>
+              <p-select
+                [options]="filterOptions"
+                formControlName="articleFilter"
+                placeholder="Seleziona lista"
+                (onChange)="onFilterChange($event)"
+              />
+            </div>
+
+            <ng-container *ngIf="showFilterSelector()">
+              <div class="flex flex-col gap-2 w-full">
+                <label for="filterValue">Filtra per:</label>
+                <p-select [options]="getFilterValues()" formControlName="filterValue" placeholder="Seleziona filtro" />
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</p-fluid>

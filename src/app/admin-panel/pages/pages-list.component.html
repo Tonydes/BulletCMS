@@ -1,0 +1,79 @@
+<p-toolbar styleClass="mb-6">
+  <ng-template #start>
+    <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
+    <p-button
+      severity="secondary"
+      label="Delete"
+      icon="pi pi-trash"
+      outlined
+      (onClick)="deleteSelectedPages()"
+      [disabled]="!selectedPages || !selectedPages.length"
+    />
+  </ng-template>
+</p-toolbar>
+
+<p-table
+  #dt
+  [value]="pages.value() ?? []"
+  [rows]="10"
+  [columns]="cols"
+  [paginator]="true"
+  [globalFilterFields]="['name', 'country.name', 'representative.name', 'status']"
+  [tableStyle]="{ 'min-width': '75rem' }"
+  [(selection)]="selectedPages"
+  [rowHover]="true"
+  dataKey="id"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} pages"
+  [showCurrentPageReport]="true"
+  [rowsPerPageOptions]="[10, 20, 30]"
+>
+  <ng-template #caption>
+    <div class="flex items-center justify-between">
+      <h5 class="m-0">Manage Pages</h5>
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
+      </p-iconfield>
+    </div>
+  </ng-template>
+  <ng-template #header>
+    <tr>
+      <th style="width: 3rem">
+        <p-tableHeaderCheckbox />
+      </th>
+      <th style="min-width: 16rem">ID</th>
+      <th pSortableColumn="title" style="min-width: 16rem">
+        Title
+        <p-sortIcon field="title" />
+      </th>
+      <th>Image</th>
+      <th pSortableColumn="content" style="min-width: 10rem">
+        Content
+        <p-sortIcon field="content" />
+      </th>
+      <th style="min-width: 12rem"></th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-page>
+    <tr>
+      <td style="width: 3rem">
+        <p-tableCheckbox [value]="page" />
+      </td>
+      <td style="min-width: 3rem">{{ page.id }}</td>
+      <td style="min-width: 16rem">{{ page.title }}</td>
+      <td>
+        <img
+          [src]="'https://primefaces.org/cdn/primeng/images/demo/page/' + page.image"
+          [alt]="page.title"
+          style="width: 64px"
+          class="rounded"
+        />
+      </td>
+      <td>{{ page.content }}</td>
+      <td>
+        <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editPage(page.id)" />
+        <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deletePage(page.id)" />
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
